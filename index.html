@@ -599,7 +599,7 @@ async function manageListing() {
 async function executeTrade(listingId, bidId, sellerGets, buyerTotal, buyerPhone) {
   if (!confirm('Execute this trade? This cannot be undone.')) return;
   try {
-    await db.updateListing(listingId, { executed: true, executed_at: new Date().toISOString() });
+    await db.updateListing(listingId, { executed: true, executed_at: new Date().now() });
     document.getElementById('manageResult').innerHTML = `
       <div class="notice" style="color:var(--success);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07);">
         ✅ <b>Trade Executed!</b><br><br>
