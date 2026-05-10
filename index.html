@@ -475,7 +475,7 @@ async function submitListing() {
     await db.insertListing({
       id: genId(), bhawan, room, min_price: price,
       phone, description: desc, code,
-      created_at: new Date().toISOString(), executed: false
+      created_at: new Date().now(), executed: false
     });
     ['sellBhawan','sellRoom','sellPrice','sellPhone','sellDesc'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('pricePreview').classList.remove('visible');
