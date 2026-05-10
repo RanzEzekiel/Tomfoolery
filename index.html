@@ -407,8 +407,8 @@ function renderListings(listings) {
         </div>
         ${bidsHTML}
         <div class="listing-actions">
-          <button class="btn btn-sm btn-bid" onclick="openBidModal('${l.id}','${l.bhawan}','${l.room}','${l.min_price}')">💰 Place Bid</button>
-          <button class="btn btn-sm btn-withdraw" onclick="openWithdrawModal('${l.id}','${l.bhawan}','${l.room}')">↩ Withdraw Bid</button>
+          <button class="btn btn-sm btn-bid" onclick="openBidModal('${l.id}','${l.bhawan}','${String(l.room).replace(/'/g, "\\'")}','${l.min_price}')">💰 Place Bid</button>
+          <button class="btn btn-sm btn-withdraw" onclick="openWithdrawModal('${l.id}','${l.bhawan}','${String(l.room).replace(/'/g, "\\'")}'')">↩ Withdraw Bid</button>
         </div>
       </div>`;
   }).join('');
