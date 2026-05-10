@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BhawanBid — IIT Roorkee Room Exchange</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d0d0d;--surface:#141414;--surface2:#1c1c1c;--border:#2a2a2a;--accent:#f97316;--accent2:#fbbf24;--text:#e8e8e8;--muted:#666;--danger:#ef4444;--success:#22c55e;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(249,115,22,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(249,115,22,0.03) 1px,transparent 1px);background-size:40px 40px;}
+  header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{display:flex;align-items:center;gap:12px;}
+  .logo-icon{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .logo-text{font-size:1.3rem;font-weight:800;letter-spacing:-0.5px;}
+  .logo-text span{color:var(--accent);}
+  .logo-sub{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:-2px;}
+  .tab-bar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;}
+  .tab-btn{padding:6px 16px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;border-radius:7px;transition:all 0.2s;}
+  .tab-btn.active{background:var(--accent);color:#000;}
+  main{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
+  .ticker{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px 0;overflow:hidden;margin-bottom:2rem;}
+  .ticker-inner{display:flex;gap:3rem;white-space:nowrap;animation:tickerMove 35s linear infinite;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);}
+  @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .ticker-item span{color:var(--accent);}
+  .hero{background:linear-gradient(135deg,var(--surface) 0%,#1a1000 100%);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;padding:1.5rem 2rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .hero h1{font-size:1.6rem;font-weight:800;letter-spacing:-0.5px;line-height:1.2;}
+  .hero h1 span{color:var(--accent);}
+  .hero p{color:var(--muted);font-size:0.85rem;margin-top:4px;font-family:'Space Mono',monospace;}
+  .stats-row{display:flex;gap:2rem;}
+  .stat{text-align:center;}
+  .stat-val{font-size:1.5rem;font-weight:800;color:var(--accent);font-family:'Space Mono',monospace;}
+  .stat-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+  @media(max-width:700px){.grid-2{grid-template-columns:1fr;}.stats-row{display:none;}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;}
+  .card-title{font-size:0.7rem;font-family:'Space Mono',monospace;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+  .card-title::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+  .form-group{margin-bottom:1rem;}
+  label{display:block;font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-family:'Space Mono',monospace;}
+  input,select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.85rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;}
+  input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,0.12);}
+  select option{background:var(--surface2);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+  .price-preview{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:-8px;margin-bottom:1rem;font-family:'Space Mono',monospace;font-size:0.75rem;display:none;}
+  .price-preview.visible{display:block;}
+  .pp-row{display:flex;justify-content:space-between;padding:3px 0;}
+  .pp-row .lbl{color:var(--muted);}
+  .pp-row.total{border-top:1px solid var(--border);margin-top:4px;padding-top:6px;font-weight:700;}
+  .btn{padding:10px 20px;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+  .btn-primary{background:var(--accent);color:#000;width:100%;justify-content:center;padding:12px;font-size:0.9rem;}
+  .btn-primary:hover{background:#fb923c;transform:translateY(-1px);box-shadow:0 4px 20px rgba(249,115,22,0.3);}
+  .btn-primary:disabled{opacity:0.6;transform:none;cursor:not-allowed;}
+  .btn-sm{padding:5px 12px;font-size:0.75rem;border-radius:6px;}
+  .btn-bid{background:rgba(34,197,94,0.15);color:var(--success);border:1px solid rgba(34,197,94,0.3);}
+  .btn-bid:hover{background:rgba(34,197,94,0.25);}
+  .btn-withdraw{background:rgba(239,68,68,0.12);color:var(--danger);border:1px solid rgba(239,68,68,0.25);}
+  .btn-withdraw:hover{background:rgba(239,68,68,0.22);}
+  .btn-execute{background:rgba(251,191,36,0.15);color:var(--accent2);border:1px solid rgba(251,191,36,0.3);}
+  .btn-execute:hover{background:rgba(251,191,36,0.25);}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);border-color:var(--muted);}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.2rem;}
+  .filter-chip{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.72rem;cursor:pointer;transition:all 0.2s;}
+  .filter-chip.active,.filter-chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,0.08);}
+  .listing{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1rem;transition:all 0.2s;position:relative;overflow:hidden;animation:fadeUp 0.3s ease both;}
+  .listing::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity 0.2s;}
+  .listing:hover{border-color:#333;transform:translateY(-1px);}
+  .listing:hover::before{opacity:1;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .listing-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .listing-room{font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;line-height:1;}
+  .listing-bhawan{font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent);margin-top:2px;text-transform:uppercase;letter-spacing:1.5px;}
+  .listing-price-block{text-align:right;}
+  .listing-price{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent2);}
+  .listing-price-label{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .listing-meta{display:flex;gap:1rem;margin-top:10px;align-items:center;flex-wrap:wrap;}
+  .meta-tag{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);}
+  .bid-count{background:rgba(249,115,22,0.15);color:var(--accent);border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:2px 10px;font-size:0.68rem;font-family:'Space Mono',monospace;font-weight:700;}
+  .listing-actions{display:flex;gap:8px;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:0.62rem;font-family:'Space Mono',monospace;font-weight:700;}
+  .badge-free{background:rgba(34,197,94,0.12);color:var(--success);border:1px solid rgba(34,197,94,0.25);}
+  .badge-paid{background:rgba(251,191,36,0.12);color:var(--accent2);border:1px solid rgba(251,191,36,0.25);}
+  .bid-panel{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-top:10px;}
+  .bid-panel-title{font-size:0.65rem;font-family:'Space Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;}
+  .bid-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-family:'Space Mono',monospace;font-size:0.78rem;}
+  .bid-row:last-child{border-bottom:none;}
+  .bid-rank{color:var(--muted);font-size:0.65rem;width:20px;}
+  .bid-amount{color:var(--success);font-weight:700;}
+  .bid-phone{color:var(--muted);font-size:0.7rem;}
+  .top-bid{color:var(--accent2)!important;}
+  .notice{background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 14px;font-family:'Space Mono',monospace;font-size:0.72rem;color:#d97706;margin-top:10px;line-height:1.6;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.8rem;width:100%;max-width:440px;transform:scale(0.95) translateY(10px);transition:transform 0.2s;}
+  .modal-overlay.open .modal{transform:scale(1) translateY(0);}
+  .modal-title{font-size:1.1rem;font-weight:800;margin-bottom:4px;}
+  .modal-sub{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);margin-bottom:1.5rem;}
+  .modal-actions{display:flex;gap:8px;margin-top:1rem;}
+  .modal-actions .btn{flex:1;justify-content:center;}
+  .bid-breakdown{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:6px;margin-bottom:4px;font-family:'Space Mono',monospace;font-size:0.75rem;display:none;}
+  .bid-breakdown.visible{display:block;}
+  .bd-row{display:flex;justify-content:space-between;padding:3px 0;}
+  .bd-row .lbl{color:var(--muted);}
+  .bd-row.bd-total{border-top:1px solid var(--border);margin-top:4px;padding-top:6px;font-weight:700;}
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--success);border-radius:10px;padding:12px 18px;font-family:'Space Mono',monospace;font-size:0.8rem;z-index:300;transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:320px;line-height:1.5;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.error{border-left-color:var(--danger);}
+  .toast.warn{border-left-color:var(--accent);}
+  .empty{text-align:center;padding:4rem 2rem;color:var(--muted);font-family:'Space Mono',monospace;font-size:0.8rem;border:1px dashed var(--border);border-radius:12px;}
+  .empty-icon{font-size:2.5rem;margin-bottom:1rem;opacity:0.4;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .manage-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1.2rem;margin-top:1rem;}
+  .manage-bid-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-family:'Space Mono',monospace;font-size:0.78rem;gap:8px;flex-wrap:wrap;}
+  .manage-bid-row:last-child{border-bottom:none;}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+  .spinner-muted{border:2px solid var(--border);border-top-color:var(--accent);}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;animation:pulse 2s infinite;}
+  .sync-label{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);display:flex;align-items:center;gap:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏠</div>
+    <div>
+      <div class="logo-text">Bhawan<span>Bid</span></div>
+      <div class="logo-sub">IIT Roorkee · Room Exchange</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:1.2rem;">
+    <div class="sync-label"><span class="sync-dot"></span><span>Live · Supabase</span></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchPage('market')">Market</button>
+      <button class="tab-btn" onclick="switchPage('sell')">List Room</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="ticker"><div class="ticker-inner" id="tickerInner">Loading market…</div></div>
+
+  <!-- MARKET -->
+  <div class="page active" id="page-market">
+    <div class="hero">
+      <div>
+        <h1>Find Your <span>Next Bhawan</span></h1>
+        <p>// live shared exchange · bid · trade · 2025-26 allotment</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val" id="statListings">—</div><div class="stat-label">Active Listings</div></div>
+        <div class="stat"><div class="stat-val" id="statBids">—</div><div class="stat-label">Open Bids</div></div>
+        <div class="stat"><div class="stat-val" id="statTrades">—</div><div class="stat-label">Trades Done</div></div>
+      </div>
+    </div>
+    <div class="filter-row">
+      <button class="filter-chip active" onclick="filterBhawan('ALL',this)">All Bhawans</button>
+      <button class="filter-chip" onclick="filterBhawan('Jawahar',this)">Jawahar</button>
+      <button class="filter-chip" onclick="filterBhawan('Ravindra',this)">Ravindra</button>
+      <button class="filter-chip" onclick="filterBhawan('RKB',this)">RKB</button>
+      <button class="filter-chip" onclick="filterBhawan('Rajiv',this)">Rajiv</button>
+      <button class="filter-chip" onclick="filterBhawan('VK',this)">VK</button>
+      <button class="filter-chip" onclick="filterBhawan('Govind',this)">Govind</button>
+    </div>
+    <div id="listingsContainer">
+      <div class="empty"><div class="empty-icon">⏳</div>Loading listings…</div>
+    </div>
+  </div>
+
+  <!-- SELL -->
+  <div class="page" id="page-sell">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">List Your Room</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Bhawan</label>
+            <select id="sellBhawan">
+              <option value="">Select Bhawan</option>
+              <option>Jawahar</option><option>Ravindra</option><option>RKB</option>
+              <option>Rajiv</option><option>VK</option><option>Govind</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Room No.</label>
+            <input type="text" id="sellRoom" placeholder="e.g. 204" maxlength="6">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Amount You Want to Receive (₹) — 0 for free</label>
+          <input type="number" id="sellPrice" placeholder="e.g. 500" min="0" oninput="updatePricePreview()">
+        </div>
+        <div class="price-preview" id="pricePreview">
+          <div class="pp-row"><span class="lbl">You receive</span><span id="ppAsk">—</span></div>
+          <div class="pp-row"><span class="lbl">Platform fee (2%)</span><span id="ppFee" style="color:var(--accent)">—</span></div>
+          <div class="pp-row total"><span class="lbl">Buyer sees &amp; pays</span><span id="ppTotal" style="color:var(--accent2)">—</span></div>
+        </div>
+        <div class="form-group">
+          <label>Your Phone (kept private)</label>
+          <input type="tel" id="sellPhone" placeholder="10-digit number" maxlength="10">
+        </div>
+        <div class="form-group">
+          <label>Description (optional)</label>
+          <input type="text" id="sellDesc" placeholder="e.g. Corner room, great ventilation">
+        </div>
+        <div class="notice">⚡ A <b>2% platform fee</b> is added — buyers pay the grossed-up price. Your phone is only revealed when <b>you execute</b> a trade. Save your 4-digit seller code!</div>
+        <button class="btn btn-primary" id="postBtn" onclick="submitListing()" style="margin-top:1rem">Post Listing →</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Manage My Listing</div>
+        <p style="font-size:0.8rem;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:1rem;line-height:1.7;">
+          Enter your <b style="color:var(--accent)">4-digit seller code</b> to view bids and execute a trade.
+        </p>
+        <div class="form-group">
+          <label>Seller Code</label>
+          <input type="text" id="manageCode" placeholder="e.g. 4821" maxlength="4" style="letter-spacing:4px;font-size:1.1rem;text-align:center;">
+        </div>
+        <button class="btn btn-primary" id="manageBtn" onclick="manageListing()" style="margin-top:0.5rem">Look Up →</button>
+        <div id="manageResult" style="margin-top:1rem;"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- BID MODAL -->
+<div class="modal-overlay" id="bidModal">
+  <div class="modal">
+    <div class="modal-title">Place a Bid</div>
+    <div class="modal-sub" id="bidModalSub">Room — Bhawan</div>
+    <div class="form-group">
+      <label>Total you pay (₹, incl. 2% fee)</label>
+      <input type="number" id="bidAmount" placeholder="Enter total you're willing to pay" min="0" oninput="updateBidBreakdown()">
+    </div>
+    <div class="bid-breakdown" id="bidBreakdown">
+      <div class="bd-row"><span class="lbl">Seller receives</span><span style="color:var(--success)" id="bdSeller">—</span></div>
+      <div class="bd-row"><span class="lbl">Platform fee (2%)</span><span style="color:var(--accent)" id="bdFee">—</span></div>
+      <div class="bd-row bd-total"><span class="lbl">You pay</span><span style="color:var(--accent2)" id="bdTotal">—</span></div>
+    </div>
+    <div class="form-group" style="margin-top:1rem;">
+      <label>Your Phone (stored privately)</label>
+      <input type="tel" id="bidPhone" placeholder="10-digit number" maxlength="10">
+    </div>
+    <div class="notice" style="margin-top:0;margin-bottom:0;">Phone revealed to seller only if they execute the trade.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeBidModal()">Cancel</button>
+      <button class="btn btn-primary" id="confirmBidBtn" onclick="submitBid()" style="background:var(--success);color:#000;">Confirm Bid</button>
+    </div>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal-overlay" id="withdrawModal">
+  <div class="modal">
+    <div class="modal-title">Withdraw Bid</div>
+    <div class="modal-sub" id="withdrawModalSub">—</div>
+    <div class="form-group">
+      <label>Your Phone (to verify it's you)</label>
+      <input type="tel" id="withdrawPhone" placeholder="10-digit number" maxlength="10">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeWithdrawModal()">Cancel</button>
+      <button class="btn btn-withdraw" id="confirmWithdrawBtn" onclick="confirmWithdraw()" style="flex:1;justify-content:center;">Withdraw Bid</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://mcuiveaztuftkkyojgfy.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jdWl2ZWF6dHVmdGtreW9qZ2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MjE5MjAsImV4cCI6MjA5Mzk5NzkyMH0.7srR1_2KpIb5WOEnzQWK6Z6DnBVIHanv4E5RG2OsXrM';
+const HEADERS = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+
+// ── SUPABASE HELPERS ───────────────────────────────────────────────────
+async function sb(path, method='GET', body=null, extra='') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}${extra}`, {
+    method, headers: { ...HEADERS, 'Prefer': method==='POST' ? 'return=representation' : '' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+const db = {
+  // listings
+  getListings: (bhawan) => {
+    let q = 'listings?executed=eq.false&order=created_at.desc';
+    if (bhawan && bhawan !== 'ALL') q += `&bhawan=eq.${bhawan}`;
+    return sb(q + '&select=*');
+  },
+  getAllListings: () => sb('listings?select=*'),
+  getListingByCode: (code) => sb(`listings?code=eq.${code}&select=*`),
+  insertListing: (data) => sb('listings', 'POST', data),
+  updateListing: (id, data) => sb(`listings?id=eq.${id}`, 'PATCH', data),
+
+  // bids
+  getBidsForListing: (lid) => sb(`bids?listing_id=eq.${lid}&withdrawn=eq.false&order=buyer_total.desc&select=*`),
+  getBidByPhone: (lid, phone) => sb(`bids?listing_id=eq.${lid}&phone=eq.${phone}&withdrawn=eq.false&select=*`),
+  insertBid: (data) => sb('bids', 'POST', data),
+  withdrawBid: (id) => sb(`bids?id=eq.${id}`, 'PATCH', { withdrawn: true }),
+};
+
+// ── COMMISSION ─────────────────────────────────────────────────────────
+const COMM = 0.02;
+function buyerPrice(sellerAsk) { return sellerAsk > 0 ? Math.ceil(sellerAsk / (1 - COMM)) : 0; }
+function sellerFromBuyer(buyerPays) { return Math.floor(buyerPays * (1 - COMM)); }
+function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function maskPhone(p) { return (!p||p.length<4) ? '••••••••••' : p.slice(0,2)+'••••••'+p.slice(-2); }
+function timeAgo(ts) {
+  const m = Math.floor((Date.now() - new Date(ts).getTime()) / 60000);
+  if (m < 1) return 'just now'; if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60); if (h < 24) return h + 'h ago';
+  return Math.floor(h / 24) + 'd ago';
+}
+function genCode() { return String(Math.floor(1000 + Math.random() * 9000)); }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+// ── STATE ──────────────────────────────────────────────────────────────
+let activeFilter = 'ALL';
+let activeBidListingId = null;
+let activeWithdrawListingId = null;
+
+// ── PAGES ──────────────────────────────────────────────────────────────
+function switchPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b, i) =>
+    b.classList.toggle('active', (i===0&&p==='market')||(i===1&&p==='sell')));
+  if (p === 'market') loadMarket();
+}
+
+function filterBhawan(b, el) {
+  activeFilter = b;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  loadMarket();
+}
+
+// ── MARKET ─────────────────────────────────────────────────────────────
+async function loadMarket() {
+  try {
+    const [listings, allListings] = await Promise.all([
+      db.getListings(activeFilter),
+      db.getAllListings()
+    ]);
+    // fetch bids for each active listing
+    const bidsArr = await Promise.all(listings.map(l => db.getBidsForListing(l.id)));
+    listings.forEach((l, i) => l._bids = bidsArr[i] || []);
+
+    renderListings(listings);
+    updateStats(allListings, listings);
+    updateTicker(listings);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('listingsContainer').innerHTML =
+      `<div class="empty"><div class="empty-icon">⚠️</div>Failed to load listings. Check your connection.</div>`;
+  }
+}
+
+function renderListings(listings) {
+  const c = document.getElementById('listingsContainer');
+  if (!listings.length) {
+    c.innerHTML = `<div class="empty"><div class="empty-icon">🏚️</div><div>No active listings${activeFilter!=='ALL'?' for '+activeFilter:''}.</div><div style="margin-top:8px;opacity:0.6;">Be the first to post your room!</div></div>`;
+    return;
+  }
+  c.innerHTML = listings.map(l => {
+    const bids = l._bids || [];
+    const displayMin = l.min_price > 0 ? buyerPrice(l.min_price) : 0;
+    const topBid = bids.length ? Math.max(...bids.map(b => b.buyer_total)) : null;
+    const bidsHTML = bids.length ? `
+      <div class="bid-panel">
+        <div class="bid-panel-title">Live Bids (total buyer pays)</div>
+        ${bids.slice(0,3).map((b,i) => `
+          <div class="bid-row">
+            <span class="bid-rank">#${i+1}</span>
+            <span class="bid-amount ${i===0?'top-bid':''}">${fmt(b.buyer_total)}</span>
+            <span class="bid-phone">${maskPhone(b.phone)}</span>
+          </div>`).join('')}
+      </div>` : '';
+    return `
+      <div class="listing">
+        <div class="listing-top">
+          <div>
+            <div class="listing-room">Room ${l.room}</div>
+            <div class="listing-bhawan">📍 ${l.bhawan} Bhawan</div>
+            ${l.description ? `<div style="font-size:0.78rem;color:var(--muted);margin-top:4px;font-family:'Space Mono',monospace;">${l.description}</div>` : ''}
+          </div>
+          <div class="listing-price-block">
+            <div class="listing-price">${l.min_price > 0 ? fmt(displayMin) : 'Free'}</div>
+            <div class="listing-price-label">Min you pay (incl. 2% fee)</div>
+            ${topBid !== null ? `<div style="font-size:0.72rem;color:var(--success);font-family:'Space Mono',monospace;margin-top:2px;">Top Bid: ${fmt(topBid)}</div>` : ''}
+          </div>
+        </div>
+        <div class="listing-meta">
+          <span class="badge ${l.min_price > 0 ? 'badge-paid' : 'badge-free'}">${l.min_price > 0 ? '💸 Paid' : '🎁 Free'}</span>
+          <span class="bid-count">${bids.length} bid${bids.length!==1?'s':''}</span>
+          <span class="meta-tag">🕐 ${timeAgo(l.created_at)}</span>
+        </div>
+        ${bidsHTML}
+        <div class="listing-actions">
+          <button class="btn btn-sm btn-bid" onclick="openBidModal('${l.id}','${l.bhawan}',${l.room},'${l.min_price}')">💰 Place Bid</button>
+          <button class="btn btn-sm btn-withdraw" onclick="openWithdrawModal('${l.id}','${l.bhawan}',${l.room})">↩ Withdraw Bid</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateStats(all, active) {
+  document.getElementById('statListings').textContent = active.length;
+  const totalBids = active.reduce((a, l) => a + (l._bids||[]).length, 0);
+  document.getElementById('statBids').textContent = totalBids;
+  document.getElementById('statTrades').textContent = all.filter(l => l.executed).length;
+}
+
+function updateTicker(listings) {
+  let items = listings.map(l => {
+    const bids = l._bids || [];
+    if (!bids.length) return `${l.bhawan} Rm.${l.room} — Min <span>${l.min_price>0?fmt(buyerPrice(l.min_price)):'Free'}</span>`;
+    const top = Math.max(...bids.map(b => b.buyer_total));
+    return `${l.bhawan} Rm.${l.room} — Top Bid <span>${fmt(top)}</span>`;
+  });
+  if (!items.length) items = ['BhawanBid · IIT Roorkee Room Exchange', 'No listings yet — post yours!'];
+  const doubled = [...items, ...items];
+  document.getElementById('tickerInner').innerHTML = doubled.map(i => `<span class="ticker-item">${i} &nbsp;&nbsp;·&nbsp;&nbsp; </span>`).join('');
+}
+
+// ── PRICE PREVIEW ──────────────────────────────────────────────────────
+function updatePricePreview() {
+  const v = parseFloat(document.getElementById('sellPrice').value);
+  const el = document.getElementById('pricePreview');
+  if (!v || v <= 0) { el.classList.remove('visible'); return; }
+  el.classList.add('visible');
+  document.getElementById('ppAsk').textContent = fmt(v);
+  document.getElementById('ppFee').textContent = fmt(buyerPrice(v) - v);
+  document.getElementById('ppTotal').textContent = fmt(buyerPrice(v));
+}
+
+// ── BID BREAKDOWN ──────────────────────────────────────────────────────
+function updateBidBreakdown() {
+  const v = parseFloat(document.getElementById('bidAmount').value);
+  const el = document.getElementById('bidBreakdown');
+  if (!v || v <= 0) { el.classList.remove('visible'); return; }
+  el.classList.add('visible');
+  const s = sellerFromBuyer(v);
+  document.getElementById('bdSeller').textContent = fmt(s);
+  document.getElementById('bdFee').textContent = fmt(v - s);
+  document.getElementById('bdTotal').textContent = fmt(v);
+}
+
+// ── SUBMIT LISTING ─────────────────────────────────────────────────────
+async function submitListing() {
+  const bhawan = document.getElementById('sellBhawan').value;
+  const room   = document.getElementById('sellRoom').value.trim();
+  const price  = parseFloat(document.getElementById('sellPrice').value);
+  const phone  = document.getElementById('sellPhone').value.trim();
+  const desc   = document.getElementById('sellDesc').value.trim();
+
+  if (!bhawan)                 return toast('Select a Bhawan!', 'error');
+  if (!room)                   return toast('Enter room number!', 'error');
+  if (isNaN(price) || price < 0) return toast('Enter a valid price (0 for free).', 'error');
+  if (!/^\d{10}$/.test(phone)) return toast('Enter a valid 10-digit phone number.', 'error');
+
+  setLoading('postBtn', true, 'Post Listing →');
+  const code = genCode();
+  try {
+    await db.insertListing({
+      id: genId(), bhawan, room, min_price: price,
+      phone, description: desc, code,
+      created_at: new Date().toISOString(), executed: false
+    });
+    ['sellBhawan','sellRoom','sellPrice','sellPhone','sellDesc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pricePreview').classList.remove('visible');
+    toast(`Listed! Your seller code: ${code} — write it down!`, 'success', 8000);
+    switchPage('market');
+  } catch(e) {
+    toast('Failed to post listing. Please try again.', 'error');
+  } finally { setLoading('postBtn', false, 'Post Listing →'); }
+}
+
+// ── BID MODAL ──────────────────────────────────────────────────────────
+let _bidListingMinPrice = 0;
+function openBidModal(id, bhawan, room, minPrice) {
+  activeBidListingId = id;
+  _bidListingMinPrice = parseFloat(minPrice) || 0;
+  document.getElementById('bidModalSub').textContent =
+    `Room ${room} · ${bhawan} Bhawan${_bidListingMinPrice > 0 ? ' · Min: ' + fmt(buyerPrice(_bidListingMinPrice)) : ''}`;
+  document.getElementById('bidAmount').value = '';
+  document.getElementById('bidPhone').value = '';
+  document.getElementById('bidBreakdown').classList.remove('visible');
+  document.getElementById('bidModal').classList.add('open');
+}
+function closeBidModal() { document.getElementById('bidModal').classList.remove('open'); activeBidListingId = null; }
+
+async function submitBid() {
+  const total = parseFloat(document.getElementById('bidAmount').value);
+  const phone = document.getElementById('bidPhone').value.trim();
+  if (!activeBidListingId) return;
+  if (isNaN(total) || total <= 0) return toast('Enter a valid bid amount.', 'error');
+  if (!/^\d{10}$/.test(phone)) return toast('Enter a valid 10-digit phone number.', 'error');
+  const minBuyer = _bidListingMinPrice > 0 ? buyerPrice(_bidListingMinPrice) : 0;
+  if (minBuyer > 0 && total < minBuyer) return toast(`Bid must be at least ${fmt(minBuyer)} (seller's min incl. fee).`, 'warn');
+
+  setLoading('confirmBidBtn', true, 'Confirm Bid');
+  try {
+    const existing = await db.getBidByPhone(activeBidListingId, phone);
+    if (existing && existing.length > 0) {
+      toast('You have an active bid here. Withdraw it first.', 'warn');
+      return;
+    }
+    await db.insertBid({
+      id: genId(), listing_id: activeBidListingId,
+      buyer_total: total, seller_gets: sellerFromBuyer(total),
+      phone, placed_at: new Date().toISOString(), withdrawn: false
+    });
+    closeBidModal();
+    toast(`Bid placed! You'd pay ${fmt(total)} total.`, 'success');
+    loadMarket();
+  } catch(e) {
+    toast('Failed to place bid. Try again.', 'error');
+  } finally { setLoading('confirmBidBtn', false, 'Confirm Bid'); }
+}
+
+// ── WITHDRAW MODAL ─────────────────────────────────────────────────────
+function openWithdrawModal(id, bhawan, room) {
+  activeWithdrawListingId = id;
+  document.getElementById('withdrawModalSub').textContent = `Room ${room} · ${bhawan} Bhawan`;
+  document.getElementById('withdrawPhone').value = '';
+  document.getElementById('withdrawModal').classList.add('open');
+}
+function closeWithdrawModal() { document.getElementById('withdrawModal').classList.remove('open'); activeWithdrawListingId = null; }
+
+async function confirmWithdraw() {
+  const phone = document.getElementById('withdrawPhone').value.trim();
+  if (!activeWithdrawListingId) return;
+  if (!/^\d{10}$/.test(phone)) return toast('Enter a valid 10-digit phone number.', 'error');
+
+  setLoading('confirmWithdrawBtn', true, 'Withdraw Bid');
+  try {
+    const bids = await db.getBidByPhone(activeWithdrawListingId, phone);
+    if (!bids || !bids.length) { toast('No active bid found for this number.', 'error'); return; }
+    await db.withdrawBid(bids[0].id);
+    closeWithdrawModal();
+    toast('Bid withdrawn successfully.', 'success');
+    loadMarket();
+  } catch(e) {
+    toast('Failed to withdraw. Try again.', 'error');
+  } finally { setLoading('confirmWithdrawBtn', false, 'Withdraw Bid'); }
+}
+
+// ── MANAGE LISTING ─────────────────────────────────────────────────────
+async function manageListing() {
+  const code = document.getElementById('manageCode').value.trim();
+  if (!code || code.length !== 4) return toast('Enter a valid 4-digit seller code.', 'error');
+  setLoading('manageBtn', true, 'Look Up →');
+  const div = document.getElementById('manageResult');
+  try {
+    const rows = await db.getListingByCode(code);
+    if (!rows || !rows.length) {
+      div.innerHTML = `<div class="notice" style="color:var(--danger);border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.07);">No listing found for code <b>${code}</b>.</div>`;
+      return;
+    }
+    const l = rows[0];
+    if (l.executed) {
+      div.innerHTML = `<div class="notice" style="color:var(--success);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07);">✅ Room ${l.room}, ${l.bhawan} — already executed.</div>`;
+      return;
+    }
+    const bids = await db.getBidsForListing(l.id);
+    const bidsHTML = bids.length
+      ? bids.map((b,i) => `
+          <div class="manage-bid-row">
+            <span style="color:${i===0?'var(--accent2)':'var(--text)'}">
+              #${i+1} &nbsp;|&nbsp; You get: <b>${fmt(b.seller_gets)}</b> &nbsp;|&nbsp; Buyer pays: <b>${fmt(b.buyer_total)}</b>
+            </span>
+            <button class="btn btn-sm btn-execute" onclick="executeTrade('${l.id}','${b.id}',${b.seller_gets},${b.buyer_total},'${b.phone}')">⚡ Execute</button>
+          </div>`).join('')
+      : `<div style="font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--muted);padding:8px 0;">No active bids yet.</div>`;
+
+    div.innerHTML = `
+      <div class="manage-card">
+        <div style="font-weight:800;font-size:1.1rem;">Room ${l.room} — ${l.bhawan} Bhawan</div>
+        <div style="font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--muted);margin:4px 0 12px;">
+          Your ask: ${fmt(l.min_price)} · Buyer min: ${l.min_price>0?fmt(buyerPrice(l.min_price)):'Free'} · Listed ${timeAgo(l.created_at)}
+        </div>
+        <div style="font-size:0.68rem;font-family:'Space Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Active Bids (${bids.length})</div>
+        ${bidsHTML}
+      </div>`;
+  } catch(e) {
+    toast('Failed to look up listing.', 'error');
+  } finally { setLoading('manageBtn', false, 'Look Up →'); }
+}
+
+async function executeTrade(listingId, bidId, sellerGets, buyerTotal, buyerPhone) {
+  if (!confirm('Execute this trade? This cannot be undone.')) return;
+  try {
+    await db.updateListing(listingId, { executed: true, executed_at: new Date().toISOString() });
+    document.getElementById('manageResult').innerHTML = `
+      <div class="notice" style="color:var(--success);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.07);">
+        ✅ <b>Trade Executed!</b><br><br>
+        You receive: <b>${fmt(sellerGets)}</b> &nbsp;|&nbsp; Platform fee: <b>${fmt(buyerTotal - sellerGets)}</b> &nbsp;|&nbsp; Buyer paid: <b>${fmt(buyerTotal)}</b><br><br>
+        📞 Buyer's phone: <b style="color:var(--accent);letter-spacing:2px;font-size:1rem;">${buyerPhone}</b><br>
+        <span style="opacity:0.7;margin-top:4px;display:block;">Contact them to complete the room handover. Congratulations!</span>
+      </div>`;
+    toast('Trade executed!', 'success', 6000);
+    loadMarket();
+  } catch(e) { toast('Failed to execute trade. Try again.', 'error'); }
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────
+function setLoading(id, on, label) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.disabled = on;
+  el.innerHTML = on
+    ? `<span class="spinner ${id==='confirmBidBtn'?'':'spinner-muted'}"></span>Loading…`
+    : label;
+}
+
+function toast(msg, type='success', duration=3500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast ' + type + ' show';
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), duration);
+}
+
+document.getElementById('bidModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeBidModal(); });
+document.getElementById('withdrawModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeWithdrawModal(); });
+
+// ── INIT + POLL ────────────────────────────────────────────────────────
+loadMarket();
+setInterval(() => {
+  if (document.getElementById('page-market').classList.contains('active')) loadMarket();
+}, 30000);
+</script>
+</body>
+</html>
