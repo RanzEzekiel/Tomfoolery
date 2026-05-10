@@ -455,7 +455,6 @@ function updateBidBreakdown() {
   document.getElementById('bdFee').textContent = fmt(v - s);
   document.getElementById('bdTotal').textContent = fmt(v);
 }
-
 // ── SUBMIT LISTING ─────────────────────────────────────────────────────
 async function submitListing() {
   const bhawan = document.getElementById('sellBhawan').value;
@@ -475,7 +474,7 @@ async function submitListing() {
     await db.insertListing({
       id: genId(), bhawan, room, min_price: price,
       phone, description: desc, code,
-      created_at: new Date().toISOString(), executed: false
+      created_at: Date.now(), executed: false
     });
     ['sellBhawan','sellRoom','sellPrice','sellPhone','sellDesc'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('pricePreview').classList.remove('visible');
@@ -519,7 +518,7 @@ async function submitBid() {
     await db.insertBid({
       id: genId(), listing_id: activeBidListingId,
       buyer_total: total, seller_gets: sellerFromBuyer(total),
-      phone, placed_at: new Date().toISOString(), withdrawn: false
+      phone, placed_at: Date.now(), withdrawn: false
     });
     closeBidModal();
     toast(`Bid placed! You'd pay ${fmt(total)} total.`, 'success');
@@ -528,7 +527,6 @@ async function submitBid() {
     toast('Failed to place bid. Try again.', 'error');
   } finally { setLoading('confirmBidBtn', false, 'Confirm Bid'); }
 }
-
 // ── WITHDRAW MODAL ─────────────────────────────────────────────────────
 function openWithdrawModal(id, bhawan, room) {
   activeWithdrawListingId = id;
